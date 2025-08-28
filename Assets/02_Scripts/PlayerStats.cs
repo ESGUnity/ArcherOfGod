@@ -1,10 +1,31 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+public class PlayerStats : BaseStats
 {
-    // private ÇÊµå
-    private float moveSpeed = 5f;
+    protected override void Awake()
+    {
+        maxHealth = Consts.PLAYER_BASE_MAX_HEALTH;
+        damage = Consts.PLAYER_BASE_DAMAGE;
+        attackSpeed = Consts.PLAYER_BASE_ATTACK_SPEED;
+        moveSpeed = Consts.PLAYER_BASE_MOVE_SPEED;
 
-    // public Getter
-    public float MoveSpeed => moveSpeed;
+        base.Awake();
+
+        StartCoroutine(DamageTestRoutine());
+    }
+
+    public override void TakeDamage(float amount)
+    {
+        base.TakeDamage(amount);
+    }
+    private IEnumerator DamageTestRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.2f); 
+            TakeDamage(100f);              
+        }
+    }
 }
