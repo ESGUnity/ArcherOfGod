@@ -4,28 +4,27 @@ using UnityEngine;
 
 public class PlayerStats : BaseStats
 {
-    protected override void Awake()
+    // 유니티 콜백
+    protected override void Start()
     {
-        maxHealth = Consts.PLAYER_BASE_MAX_HEALTH;
-        damage = Consts.PLAYER_BASE_DAMAGE;
-        attackSpeed = Consts.PLAYER_BASE_ATTACK_SPEED;
-        moveSpeed = Consts.PLAYER_BASE_MOVE_SPEED;
-
-        base.Awake();
-
-        StartCoroutine(DamageTestRoutine());
+        base.Start();
     }
 
+    // 메인
+    protected override void InitStats()
+    {
+        base.InitStats();
+        maxHealth = ConstsAndEnums.PLAYER_BASE_MAX_HEALTH;
+        damage = ConstsAndEnums.PLAYER_BASE_DAMAGE;
+        attackSpeed = ConstsAndEnums.PLAYER_BASE_ATTACK_SPEED;
+        moveSpeed = ConstsAndEnums.PLAYER_BASE_MOVE_SPEED;
+    }
     public override void TakeDamage(float amount)
     {
         base.TakeDamage(amount);
     }
-    private IEnumerator DamageTestRoutine()
+    protected override void Die()
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.2f); 
-            TakeDamage(100f);              
-        }
-    }
+        base.Die();
+    }   
 }

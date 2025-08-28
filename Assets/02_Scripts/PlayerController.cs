@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -44,7 +45,7 @@ public class PlayerController : MonoBehaviour
         //moveInput = Input.GetAxisRaw("Horizontal"); // PC 입력
 #endif
         // 가만히 있으면 공격 루프 시작, 움직이면 중단
-        if (Mathf.Abs(moveInput) < 0.01f)
+        if (Mathf.Abs(moveInput) < 0.01f && GameManager.Instance.CurrentState == GameStateEnum.Playing)
         {
             if (attackRoutine == null)
             {
@@ -81,13 +82,13 @@ public class PlayerController : MonoBehaviour
     {
         while (true)
         {
-            float wait = Mathf.Max(0.01f, stats.AttackSpeed);
+            float wait = Mathf.Max(0.1f, stats.AttackSpeed); // 최소 공격 속도 제한
             float elapsed = 0f;
 
             // 공격속도 동안 공격 준비
             while (elapsed < wait)
             {
-                if (Mathf.Abs(moveInput) > 0.01f) // 움직였다면 종료
+                if (Mathf.Abs(moveInput) > 0.01f) // 움직이거나 플레이 중이 아니라면 종료
                 {
                     StopAttack(); 
                     yield break;
@@ -97,16 +98,7 @@ public class PlayerController : MonoBehaviour
                 yield return null;
             }
 
-            // 아직도 가만히 있다면 발사
-            if (Mathf.Abs(moveInput) < 0.01f)
-            {
-                ShootArrow();
-            }
-            else
-            {
-                StopAttack();
-                yield break;
-            }
+            ShootArrow();
         }
     }
     private void StopAttack()

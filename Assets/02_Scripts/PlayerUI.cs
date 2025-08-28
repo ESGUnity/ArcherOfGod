@@ -28,7 +28,7 @@ public class PlayerUI : MonoBehaviour
     // 메인
     private void InitHealthUI()
     {
-        healthBar.fillAmount = (float)playerStats.CurrentHealth / playerStats.MaxHealth;
+        healthBar.fillAmount = playerStats.CurrentHealth / playerStats.MaxHealth;
         text_CurrentHealth.text = playerStats.CurrentHealth.ToString("F0");
     }
     private void HandleHealthChanged(float current, float max) // 체력이 변할 때 UI 변화
@@ -40,13 +40,13 @@ public class PlayerUI : MonoBehaviour
         healthBar.DOKill();
         text_CurrentHealth.DOKill();
 
-        healthBar.DOFillAmount(targetFill, Consts.HEALTH_BAR_TWEEN_DURATION)
+        healthBar.DOFillAmount(targetFill, ConstsAndEnums.HEALTH_BAR_TWEEN_DURATION)
                  .From(currentFill)
                  .SetEase(Ease.OutQuad);
 
         // 텍스트 변경
         float currentValue = float.Parse(text_CurrentHealth.text);
-        DOTween.To(() => currentValue, x => text_CurrentHealth.text = Mathf.RoundToInt(x).ToString(), current, Consts.HEALTH_BAR_TWEEN_DURATION)
+        DOTween.To(() => currentValue, x => text_CurrentHealth.text = Mathf.RoundToInt(x).ToString(), current, ConstsAndEnums.HEALTH_BAR_TWEEN_DURATION)
                .SetEase(Ease.OutQuad);
     }
 }

@@ -18,7 +18,7 @@ public class ArrowProjectile : MonoBehaviour
         speed = arrowSpeed;
 
         float distance = Vector2.Distance(start, target);
-        arcHeight = Consts.BASE_ARC_HEIGHT + distance * Consts.ARC_HEIGHT_MULTI;
+        arcHeight = ConstsAndEnums.BASE_ARC_HEIGHT + distance * ConstsAndEnums.ARC_HEIGHT_MULTI;
 
         initialized = true;
         StartCoroutine(Fly());
