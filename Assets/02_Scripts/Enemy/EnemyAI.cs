@@ -69,6 +69,15 @@ public class EnemyAI : MonoBehaviour
     }
     private void ShootArrow()
     {
-        Instantiate(prefab_ArrowProjectile, firePoint.position, firePoint.rotation);
+        PlayerController target = PlayerController.Instance;
+
+        if (target != null)
+        {
+            float distance = Vector3.Distance(firePoint.position, target.transform.position);
+            float arcHeight = ConstsAndEnums.BASE_ARC_HEIGHT + distance * ConstsAndEnums.ARC_HEIGHT_MULTI;
+
+            GameObject arrowObj = Instantiate(prefab_ArrowProjectile, firePoint.position, firePoint.rotation);
+            arrowObj.GetComponent<ArrowProjectile>().Launch(firePoint.position, target.transform.position, arcHeight, ConstsAndEnums.ARROW_SPEED, stats.Damage, "Player");
+        }
     }
 }

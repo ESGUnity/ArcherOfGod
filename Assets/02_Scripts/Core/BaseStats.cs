@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class BaseStats : MonoBehaviour
 {
+    // ÇÁ¸®ÆÕ
+    [Header("ÇÁ¸®ÆÕ")]
+    [SerializeField] private GameObject prefab_FloatingDamageText;
+
     // private ÇÊµå
     protected float maxHealth;
     protected float currentHealth;
@@ -38,6 +42,8 @@ public class BaseStats : MonoBehaviour
     {
         currentHealth -= amount;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        Instantiate(prefab_FloatingDamageText).GetComponent<FloatingDamageText>().ShowDamage(amount, transform.position);
 
         if (currentHealth <= 0)
         {

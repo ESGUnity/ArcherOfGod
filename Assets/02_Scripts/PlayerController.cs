@@ -88,9 +88,8 @@ public class PlayerController : MonoBehaviour
             // 공격속도 동안 공격 준비
             while (elapsed < wait)
             {
-                if (Mathf.Abs(moveInput) > 0.01f) // 움직이거나 플레이 중이 아니라면 종료
+                if (Mathf.Abs(moveInput) > 0.01f || GameManager.Instance.CurrentState != GameStateEnum.Playing) // 움직이거나 플레이 중이 아니라면 종료
                 {
-                    StopAttack(); 
                     yield break;
                 }
 
@@ -98,7 +97,16 @@ public class PlayerController : MonoBehaviour
                 yield return null;
             }
 
-            ShootArrow();
+            Enemy target = EnemyManager.Instance.GetClosestEnemy(transform.position);
+
+            if (target != null)
+            {
+                float distance = Vector3.Distance(firePoint.position, target.transform.position);
+                float arcHeight = ConstsAndEnums.BASE_ARC_HEIGHT + distance * ConstsAndEnums.ARC_HEIGHT_MULTI;
+
+                GameObject arrowObj = Instantiate(prefab_BasicArrowProjectile, firePoint.position, firePoint.rotation);
+                arrowObj.GetComponent<ArrowProjectile>().Launch(firePoint.position, target.transform.position, arcHeight, ConstsAndEnums.ARROW_SPEED, stats.Damage, "Enemy");
+            }
         }
     }
     private void StopAttack()
@@ -108,9 +116,5 @@ public class PlayerController : MonoBehaviour
             StopCoroutine(attackRoutine);
             attackRoutine = null;
         }
-    }
-    private void ShootArrow()
-    {
-        GameObject arrowObj = Instantiate(prefab_BasicArrowProjectile, firePoint.position, firePoint.rotation);
     }
 }

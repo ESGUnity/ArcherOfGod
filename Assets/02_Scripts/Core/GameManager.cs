@@ -1,6 +1,8 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -14,10 +16,12 @@ public class GameManager : MonoBehaviour
     [Header("씬 오브젝트")]
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private List<Transform> enemySpawnPoints;
+    [SerializeField] private GameObject text_WaveAlarm;
 
     // private 필드
     private GameStateEnum currentState; // 현재 게임 상태
     private int currentWave = 0; // 현재 웨이브 단계
+    private Vector3 waveTextOriginPos = new Vector3(0, 100, 0);
 
     // public Getter
     public GameStateEnum CurrentState => currentState;
@@ -63,14 +67,10 @@ public class GameManager : MonoBehaviour
             Debug.Log($"Wave {currentWave} 시작!");
             ChangeState(GameStateEnum.WaitWave);
 
-            // Wave 텍스트 띄우기
-
             // 적 스폰
             SpawnEnemies();
-
-            // 3초 대기 (대치 상태)
-            Debug.Log("전투 대기 상태 (3초)");
-            yield return new WaitForSeconds(3f);
+            // Wave 텍스트 띄우기
+            yield return StartCoroutine(ShowWaveText(currentWave));
 
             // 전투 시작
             ChangeState(GameStateEnum.Playing);
@@ -111,10 +111,29 @@ public class GameManager : MonoBehaviour
             tempPos.RemoveAt(randomIndex);
         }
     }
-    private IEnumerator ShowWaveText()
+    private IEnumerator ShowWaveText(int wave)
     {
-        Debug.Log($"Wave {currentWave}");
-        yield return new WaitForSeconds(1.5f);
+        text_WaveAlarm.gameObject.SetActive(true);
+        var tmp = text_WaveAlarm.GetComponent<TMP_Text>();
+        tmp.text = $"Wave {wave}";
+
+        // RectTransform 가져오기
+        RectTransform rect = text_WaveAlarm.GetComponent<RectTransform>();
+
+        // 초기 세팅
+        rect.anchoredPosition = waveTextOriginPos; // RectTransform 기준
+        tmp.alpha = 0f;
+
+        // DOTween Sequence 생성
+        Sequence seq = DOTween.Sequence();
+        seq.Append(tmp.DOFade(1f, 0.5f));
+        seq.Join(rect.DOAnchorPosY(waveTextOriginPos.y + 50f, 0.5f)); // 2f 대신 100f 정도로 UI 단위
+        seq.AppendInterval(2f); // 2초 대기
+        seq.Append(tmp.DOFade(0f, 0.5f));
+        seq.Join(rect.DOAnchorPosY(waveTextOriginPos.y, 0.5f));
+        seq.OnComplete(() => text_WaveAlarm.SetActive(false));
+
+        yield return seq.WaitForCompletion();
     }
 
     // 게임 플로우 제어

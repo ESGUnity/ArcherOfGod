@@ -1,54 +1,116 @@
+ï»¿using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 
 public class ArrowProjectile : MonoBehaviour
 {
-    // private ÇÊµå
-    private Vector2 start;
-    private Vector2 target;
-    private float speed;
+    // í”„ë¦¬íŒ¹
+    [Header("í”„ë¦¬íŒ¹")]
+    [SerializeField] private GameObject prefab_HitVFX;
+
+    // private í•„ë“œ
+    private Vector3 startPos;
+    private Vector3 targetPos;
     private float arcHeight;
-    private bool initialized;
+    private float speed;
+    private float travelTime;
+    private float damage;
+    private string targetTag;
+    private SpriteRenderer spriteRenderer;
 
-    // ¸ÞÀÎ
-    public void Initialize(Vector2 startPos, Vector2 targetPos, float arrowSpeed) // È­»ì »ý¼º ½Ã
+    private void Awake()
     {
-        start = startPos;
-        target = targetPos;
-        speed = arrowSpeed;
-
-        float distance = Vector2.Distance(start, target);
-        arcHeight = ConstsAndEnums.BASE_ARC_HEIGHT + distance * ConstsAndEnums.ARC_HEIGHT_MULTI;
-
-        initialized = true;
-        StartCoroutine(Fly());
+        TryGetComponent(out spriteRenderer);
     }
-    private IEnumerator Fly() // ±Ëµµ¸¦ µû¶ó ³¯¾Æ°¡´Â ÄÚ·çÆ¾
+
+    // ë©”ì¸
+    public void Launch(Vector3 start, Vector3 target, float arcHeight, float speed, float damage, string targetTag)
     {
-        float distance = Vector2.Distance(start, target);
-        float travelTime = distance / speed;
+        // ì£¼ìš” ë³€ìˆ˜ ì´ˆê¸°í™”
+        startPos = start;
+        targetPos = target;
+        targetPos.y = -0.3f;
+        this.arcHeight = arcHeight;
+        this.speed = speed;
+        this.damage = damage;
+        this.targetTag = targetTag;
+
+        float distance = Vector3.Distance(start, target);
+        travelTime = distance / speed * 1.2f;
+
+        // íšŒì „ ì²˜ë¦¬
+        Vector3 prevPos = startPos;
+        Vector3 position = Vector3.Lerp(startPos, targetPos, 0.05f);
+        position.y += arcHeight * Mathf.Sin(0);
+        transform.position = position;
+        Vector3 dir = position - prevPos;
+        if (dir.sqrMagnitude > 0.0001f)
+        {
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
+
+        StartCoroutine(MoveAlongArc());
+    }
+
+    private IEnumerator MoveAlongArc()
+    {
         float elapsed = 0f;
+        Vector3 prevPos = startPos;
 
         while (elapsed < travelTime)
         {
+            float t = elapsed / travelTime;
+            Vector3 position = Vector3.Lerp(startPos, targetPos, t);
+            position.y += arcHeight * Mathf.Sin(Mathf.PI * t);
+            transform.position = position;
+
+            // íšŒì „ ì²˜ë¦¬: ì´ë™ ë°©í–¥ì„ ë°”ë¼ë³´ë„ë¡
+            Vector3 dir = position - prevPos;
+            if (dir.sqrMagnitude > 0.0001f)
+            {
+                float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
+            prevPos = position;
+
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / travelTime);
-
-            // Æ÷¹°¼± À§Ä¡ °è»ê
-            Vector2 currentPos = Vector2.Lerp(start, target, t);
-            currentPos.y += Mathf.Sin(t * Mathf.PI) * arcHeight;
-
-            transform.position = currentPos;
             yield return null;
         }
 
-        transform.position = target;
-        HitTarget();
+        transform.position = targetPos;
+        FadeOutAndDestroy();
     }
 
-    private void HitTarget()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Arrow hit target!");
-        Destroy(gameObject);
+        if (collision.CompareTag("Ground"))
+        {
+            StopAllCoroutines();
+            FadeOutAndDestroy();
+            GetComponent<Collider2D>().enabled = false;
+        }
+        else if (collision.CompareTag(targetTag))
+        {
+            GameObject go = Instantiate(prefab_HitVFX);
+            go.transform.position = transform.position;
+            BaseStats stats = collision.GetComponent<BaseStats>();
+            stats?.TakeDamage(damage);
+            Destroy(gameObject);
+        }
+    }
+    private void FadeOutAndDestroy()
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.DOFade(0f, 1.5f).OnComplete(() =>
+            {
+                Destroy(gameObject);
+            });
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

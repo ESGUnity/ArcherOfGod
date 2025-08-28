@@ -212,7 +212,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: 880557277
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &264851582453669548
@@ -577,8 +577,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 2052491429
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 224894099de085c459f5e4c9ce274614, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -693,5 +693,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfd98aee8302efd498f860d31689713d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefab_FloatingDamageText: {fileID: 4498282543152938294, guid: 76d6adb9f1c4a924c8bd62c722c11474, type: 3}
   healthBar: {fileID: 2113047870894580172}
   text_CurrentHealth: {fileID: 914501858514212263}

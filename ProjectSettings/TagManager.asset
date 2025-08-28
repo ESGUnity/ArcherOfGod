@@ -44,6 +44,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Arrow
+    uniqueID: 3036414101
+    locked: 0
+  - name: Character
+    uniqueID: 2052491429
+    locked: 0
+  - name: UI
+    uniqueID: 880557277
+    locked: 0
   m_RenderingLayers:
   - Default
   - Light Layer 1

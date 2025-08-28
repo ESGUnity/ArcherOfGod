@@ -52,6 +52,8 @@ public class EnemyStats : BaseStats
     }
     public override void TakeDamage(float amount)
     {
+        if (GameManager.Instance.CurrentState != GameStateEnum.Playing) return;
+
         base.TakeDamage(amount);
         HandleHealthChanged();
     }
