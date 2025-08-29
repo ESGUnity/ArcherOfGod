@@ -17,8 +17,12 @@ public class BaseStats : MonoBehaviour
 
     protected float jumpShotArrowCount;
     protected float jumpShotCooldown;
+
     protected float straightShotArrowCount;
     protected float straightShotCooldown;
+
+    protected float multiShotArrowCount;
+    protected float multiShotCooldown;
 
     // public Getter
     public float MaxHealth => maxHealth;
@@ -31,6 +35,8 @@ public class BaseStats : MonoBehaviour
     public float JumpShotCooldown => jumpShotCooldown;
     public float StraightShotArrowCount => straightShotArrowCount;
     public float StraightShotCooldown => straightShotCooldown;
+    public float MultiShotArrowCount => straightShotArrowCount;
+    public float MultiShotCooldown => straightShotCooldown;
 
     // public ÇÊµå
     public event Action<float, float> OnHealthChanged;

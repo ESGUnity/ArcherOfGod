@@ -6,6 +6,7 @@ public class ArrowProjectile : MonoBehaviour
 {
     // 프리팹
     [Header("프리팹")]
+    [SerializeField] private GameObject prefab_FireVFX;
     [SerializeField] private GameObject prefab_HitVFX;
 
     // private 필드
@@ -50,6 +51,12 @@ public class ArrowProjectile : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
         }
 
+        // 효과
+        GameObject go = Instantiate(prefab_FireVFX);
+        go.transform.position = transform.position;
+        AudioManager.Instance.PlaySFX(SFXEnum.FireArrow);
+
+        // 루틴 시작
         StartCoroutine(MoveAlongArc());
     }
     private IEnumerator MoveAlongArc()
@@ -97,7 +104,12 @@ public class ArrowProjectile : MonoBehaviour
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // 이동 시작
+        // 효과
+        GameObject go = Instantiate(prefab_FireVFX);
+        go.transform.position = transform.position;
+        AudioManager.Instance.PlaySFX(SFXEnum.FireArrow);
+
+        // 루틴 시작
         StartCoroutine(MoveStraight(dir));
     }
 
@@ -143,8 +155,16 @@ public class ArrowProjectile : MonoBehaviour
         }
         else if (collision.CompareTag(targetTag))
         {
+            if (targetTag == "Player") // 플레이어인 경우 피격 효과 
+            {
+                DamagePostEffect.Instance.PlayDamageEffect();
+            }
+
+            // 효과
             GameObject go = Instantiate(prefab_HitVFX);
             go.transform.position = transform.position;
+            AudioManager.Instance.PlaySFX(SFXEnum.Hit);
+
             BaseStats stats = collision.GetComponent<BaseStats>();
             stats?.TakeDamage(damage);
             Destroy(gameObject);

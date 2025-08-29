@@ -101,6 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a157b73a9bdf6c419c679cf45659888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefab_FireVFX: {fileID: 447409866740539227, guid: caa398336b8220e45a5bdd4577051a79, type: 3}
   prefab_HitVFX: {fileID: 6982263153641847612, guid: 4eeeb8508115ea5468eba171f740419e, type: 3}
 --- !u!61 &8059669417493792038
 BoxCollider2D:

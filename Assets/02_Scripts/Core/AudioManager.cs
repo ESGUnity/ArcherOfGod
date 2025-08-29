@@ -6,7 +6,7 @@ public enum BGMEnum
 }
 public enum SFXEnum
 {
-    Dialog = 0, HitCard = 1, CardHovering = 2, CardActivated = 3, Harm = 4,
+    FireArrow = 0, Hit = 1
 }
 public enum UIEnum
 {

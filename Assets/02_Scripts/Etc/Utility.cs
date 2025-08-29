@@ -29,6 +29,10 @@ public static class Utility
     public const float STRAIGHT_SHOT_COOLDOWN = 6f;
     public const float STRAIGHT_SHOT_ATTACK_SPEED = 0.6f;
 
+    public const int MULTI_SHOT_ARROW_COUNT = 5;
+    public const float MULTI_SHOT_COOLDOWN = 11f;
+    public const float MULTI_SHOT_ATTACK_SPEED = 1.1f;
+
     // 적 AI 관련
     public const float ENEMY_MIN_MOVE_DURATION = 1.5f; // 한 방향으로 움직이는 시간
     public const float ENEMY_MAX_MOVE_DURATION = 2.5f; // 한 방향으로 움직이는 시간

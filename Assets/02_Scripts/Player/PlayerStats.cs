@@ -25,8 +25,12 @@ public class PlayerStats : BaseStats
 
         jumpShotArrowCount = Utility.JUMP_SHOT_ARROW_COUNT;
         jumpShotCooldown = Utility.JUMP_SHOT_COOLDOWN;
+
         straightShotArrowCount = Utility.STRAIGHT_SHOT_ARROW_COUNT;
         straightShotCooldown = Utility.STRAIGHT_SHOT_COOLDOWN;
+
+        multiShotArrowCount = Utility.MULTI_SHOT_ARROW_COUNT;
+        multiShotCooldown = Utility.MULTI_SHOT_COOLDOWN;
     }
     public override void TakeDamage(float amount)
     {
