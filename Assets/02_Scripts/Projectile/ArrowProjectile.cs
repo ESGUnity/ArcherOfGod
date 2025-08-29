@@ -24,7 +24,7 @@ public class ArrowProjectile : MonoBehaviour
     }
 
     // 메인
-    public void Launch(Vector3 start, Vector3 target, float arcHeight, float speed, float damage, string targetTag)
+    public void LaunchArc(Vector3 start, Vector3 target, float arcHeight, float speed, float damage, string targetTag)
     {
         // 주요 변수 초기화
         startPos = start;
@@ -52,7 +52,6 @@ public class ArrowProjectile : MonoBehaviour
 
         StartCoroutine(MoveAlongArc());
     }
-
     private IEnumerator MoveAlongArc()
     {
         float elapsed = 0f;
@@ -81,7 +80,59 @@ public class ArrowProjectile : MonoBehaviour
         transform.position = targetPos;
         FadeOutAndDestroy();
     }
+    public void LaunchStraight(Vector3 start, Vector3 target, float speed, float damage, string targetTag)
+    {
+        // 변수 초기화
+        startPos = start;
+        targetPos = target;
+        this.speed = speed;
+        this.damage = damage;
+        this.targetTag = targetTag;
 
+        // 방향 계산
+        Vector3 dir = (targetPos - startPos).normalized;
+
+        // 초기 위치 & 회전 세팅
+        transform.position = startPos;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
+        // 이동 시작
+        StartCoroutine(MoveStraight(dir));
+    }
+
+    private IEnumerator MoveStraight(Vector3 direction)
+    {
+        float lifetime = 5f; // 5초 후 강제 삭제 (원하는 값으로 조정 가능)
+        float elapsed = 0f;
+
+        while (elapsed < lifetime)
+        {
+            // 직선 이동
+            transform.position += direction * speed * Time.deltaTime;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        FadeOutAndDestroy();
+    }
+    private void FadeOutAndDestroy()
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.DOFade(0f, 1.5f).OnComplete(() =>
+            {
+                Destroy(gameObject);
+            });
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // 물리 콜백
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Ground"))
@@ -96,20 +147,6 @@ public class ArrowProjectile : MonoBehaviour
             go.transform.position = transform.position;
             BaseStats stats = collision.GetComponent<BaseStats>();
             stats?.TakeDamage(damage);
-            Destroy(gameObject);
-        }
-    }
-    private void FadeOutAndDestroy()
-    {
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.DOFade(0f, 1.5f).OnComplete(() =>
-            {
-                Destroy(gameObject);
-            });
-        }
-        else
-        {
             Destroy(gameObject);
         }
     }

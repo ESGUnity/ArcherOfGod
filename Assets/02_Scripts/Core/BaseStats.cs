@@ -15,6 +15,11 @@ public class BaseStats : MonoBehaviour
     protected float attackSpeed;
     protected float moveSpeed;
 
+    protected float jumpShotArrowCount;
+    protected float jumpShotCooldown;
+    protected float straightShotArrowCount;
+    protected float straightShotCooldown;
+
     // public Getter
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
@@ -22,13 +27,21 @@ public class BaseStats : MonoBehaviour
     public float AttackSpeed => attackSpeed;
     public float MoveSpeed => moveSpeed;
 
+    public float JumpShotArrowCount => jumpShotArrowCount;
+    public float JumpShotCooldown => jumpShotCooldown;
+    public float StraightShotArrowCount => straightShotArrowCount;
+    public float StraightShotCooldown => straightShotCooldown;
+
     // public 필드
     public event Action<float, float> OnHealthChanged;
 
     // 유니티 콜백
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         InitStats();
+    }
+    protected virtual void Start()
+    {
         currentHealth = maxHealth;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }

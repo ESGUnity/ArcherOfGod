@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class ConstsAndEnums
+public static class Utility
 {
     // 플레이어 스탯 관련
     public const float PLAYER_BASE_MAX_HEALTH = 1000f;
@@ -18,6 +18,17 @@ public static class ConstsAndEnums
     public const float ENEMY_DAMAGE_MULTI = 0.1f;
     public const float ENEMY_ATTACK_SPEED_MULTI = 0.1f;
 
+    // 스킬 관련
+    public const int JUMP_SHOT_ARROW_COUNT = 1;
+    public const float JUMP_SHOT_COOLDOWN = 8f;
+    public const float JUMP_HEIGHT_Y_VALUE = 3f;
+    public const float JUMP_UP_AND_FALL_TIME = 0.3f;
+    public const float JUMP_SHOT_ATTACK_SPEED = 0.2f;
+
+    public const int STRAIGHT_SHOT_ARROW_COUNT = 1;
+    public const float STRAIGHT_SHOT_COOLDOWN = 6f;
+    public const float STRAIGHT_SHOT_ATTACK_SPEED = 0.6f;
+
     // 적 AI 관련
     public const float ENEMY_MIN_MOVE_DURATION = 1.5f; // 한 방향으로 움직이는 시간
     public const float ENEMY_MAX_MOVE_DURATION = 2.5f; // 한 방향으로 움직이는 시간
@@ -32,8 +43,6 @@ public static class ConstsAndEnums
     // UI 관련
     public const float HEALTH_BAR_TWEEN_DURATION = 0.2f;
 }
-
-
 public enum GameStateEnum // 게임 상태 enum
 {
     None,
@@ -41,4 +50,15 @@ public enum GameStateEnum // 게임 상태 enum
     WaitWave,
     Playing,
     GameOver
+}
+public enum MoveBtnEnum
+{
+    None, Left, Right
+}
+public enum SkillBtnEnum
+{
+    FirstSkill,
+    SecondSkill,
+    ThirdSkill,
+    FourthSkill,
 }

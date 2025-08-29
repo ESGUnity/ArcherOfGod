@@ -43,7 +43,7 @@ public class EnemyAI : MonoBehaviour
 
             // 이동
             float moveTime = 0f;
-            float moveDuration = Random.Range(ConstsAndEnums.ENEMY_MIN_MOVE_DURATION, ConstsAndEnums.ENEMY_MAX_MOVE_DURATION);
+            float moveDuration = Random.Range(Utility.ENEMY_MIN_MOVE_DURATION, Utility.ENEMY_MAX_MOVE_DURATION);
             while (moveTime < moveDuration)
             {
                 rb.linearVelocity = new Vector2(moveDirection * stats.MoveSpeed, rb.linearVelocity.y);
@@ -55,7 +55,7 @@ public class EnemyAI : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
 
             // 정지 후 화살 쏘기
-            int shots = Random.Range(ConstsAndEnums.ENEMY_MIN_ARROWS_PER_STOP, ConstsAndEnums.ENEMY_MAX_ARROWS_PER_STOP);
+            int shots = Random.Range(Utility.ENEMY_MIN_ARROWS_PER_STOP, Utility.ENEMY_MAX_ARROWS_PER_STOP);
             for (int i = 0; i < shots; i++)
             {
                 yield return new WaitForSeconds(stats.AttackSpeed);
@@ -74,10 +74,10 @@ public class EnemyAI : MonoBehaviour
         if (target != null)
         {
             float distance = Vector3.Distance(firePoint.position, target.transform.position);
-            float arcHeight = ConstsAndEnums.BASE_ARC_HEIGHT + distance * ConstsAndEnums.ARC_HEIGHT_MULTI;
+            float arcHeight = Utility.BASE_ARC_HEIGHT + distance * Utility.ARC_HEIGHT_MULTI;
 
             GameObject arrowObj = Instantiate(prefab_ArrowProjectile, firePoint.position, firePoint.rotation);
-            arrowObj.GetComponent<ArrowProjectile>().Launch(firePoint.position, target.transform.position, arcHeight, ConstsAndEnums.ARROW_SPEED, stats.Damage, "Player");
+            arrowObj.GetComponent<ArrowProjectile>().LaunchArc(firePoint.position, target.transform.position, arcHeight, Utility.ARROW_SPEED, stats.Damage, "Player");
         }
     }
 }

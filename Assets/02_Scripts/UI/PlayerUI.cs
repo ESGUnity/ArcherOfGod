@@ -40,13 +40,13 @@ public class PlayerUI : MonoBehaviour
         healthBar.DOKill();
         text_CurrentHealth.DOKill();
 
-        healthBar.DOFillAmount(targetFill, ConstsAndEnums.HEALTH_BAR_TWEEN_DURATION)
+        healthBar.DOFillAmount(targetFill, Utility.HEALTH_BAR_TWEEN_DURATION)
                  .From(currentFill)
                  .SetEase(Ease.OutQuad);
 
         // 텍스트 변경
         float currentValue = float.Parse(text_CurrentHealth.text);
-        DOTween.To(() => currentValue, x => text_CurrentHealth.text = Mathf.RoundToInt(x).ToString(), current, ConstsAndEnums.HEALTH_BAR_TWEEN_DURATION)
+        DOTween.To(() => currentValue, x => text_CurrentHealth.text = Mathf.RoundToInt(x).ToString(), current, Utility.HEALTH_BAR_TWEEN_DURATION)
                .SetEase(Ease.OutQuad);
     }
 }

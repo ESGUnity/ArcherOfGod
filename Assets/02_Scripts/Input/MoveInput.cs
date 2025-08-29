@@ -1,30 +1,30 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MobileInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+public class MoveInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
 {
     // private 필드(인스펙터 노출)
-    [SerializeField] private ButtonType buttonType;
+    [SerializeField] private MoveBtnEnum buttonType;
 
     // 메인
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (buttonType == ButtonType.Left)
+        if (buttonType == MoveBtnEnum.Left)
         {
             PlayerController.Instance.MoveLeft();
         }
-        else if (buttonType == ButtonType.Right)
+        else if (buttonType == MoveBtnEnum.Right)
         {
             PlayerController.Instance.MoveRight();
         }
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (buttonType == ButtonType.Left)
+        if (buttonType == MoveBtnEnum.Left)
         {
             PlayerController.Instance.MoveLeft();
         }
-        else if (buttonType == ButtonType.Right)
+        else if (buttonType == MoveBtnEnum.Right)
         {
             PlayerController.Instance.MoveRight();
         }
@@ -37,8 +37,4 @@ public class MobileInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         PlayerController.Instance.StopMove();
     }
-}
-public enum ButtonType
-{ 
-    Left, Right 
 }

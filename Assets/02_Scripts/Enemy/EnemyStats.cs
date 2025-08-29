@@ -9,6 +9,10 @@ public class EnemyStats : BaseStats
     [SerializeField] private Image healthBar;
     [SerializeField] private TMP_Text text_CurrentHealth;
 
+    protected override void Awake()
+    {
+        base.Awake();
+    }
     protected override void Start()
     {
         base.Start();
@@ -24,10 +28,10 @@ public class EnemyStats : BaseStats
         int enemyCount = EnemyManager.Instance.Enemies.Count; // 현재 스폰된 적 수
 
         // 웨이브별 능력치 계산
-        float healthMultiplier = 1 + (ConstsAndEnums.ENEMY_HEALTH_MULTI * (currentWave - 1));
-        float damageMultiplier = 1 + (ConstsAndEnums.ENEMY_DAMAGE_MULTI * (currentWave - 1));
-        float attackSpeedReduction = ConstsAndEnums.ENEMY_BASE_ATTACK_SPEED
-                                     - (Mathf.Floor((currentWave - 1) / 5f) * ConstsAndEnums.ENEMY_ATTACK_SPEED_MULTI);
+        float healthMultiplier = 1 + (Utility.ENEMY_HEALTH_MULTI * (currentWave - 1));
+        float damageMultiplier = 1 + (Utility.ENEMY_DAMAGE_MULTI * (currentWave - 1));
+        float attackSpeedReduction = Utility.ENEMY_BASE_ATTACK_SPEED
+                                     - (Mathf.Floor((currentWave - 1) / 5f) * Utility.ENEMY_ATTACK_SPEED_MULTI);
         attackSpeedReduction = Mathf.Max(0.5f, attackSpeedReduction); // 최소 공격속도 제한
 
         // 스폰된 적 개수에 따른 보정값 계산
@@ -43,12 +47,12 @@ public class EnemyStats : BaseStats
         }
 
         // 최종 스탯 설정
-        maxHealth = ConstsAndEnums.ENEMY_BASE_MAX_HEALTH * healthMultiplier * balanceMultiplier;
-        damage = ConstsAndEnums.ENEMY_BASE_DAMAGE * damageMultiplier * balanceMultiplier;
+        maxHealth = Utility.ENEMY_BASE_MAX_HEALTH * healthMultiplier * balanceMultiplier;
+        damage = Utility.ENEMY_BASE_DAMAGE * damageMultiplier * balanceMultiplier;
         attackSpeed = attackSpeedReduction;
-        moveSpeed = ConstsAndEnums.ENEMY_BASE_MOVE_SPEED;
+        moveSpeed = Utility.ENEMY_BASE_MOVE_SPEED;
 
-        Debug.Log($"Wave {currentWave} | EnemyCount: {enemyCount} | HP: {maxHealth}, DMG: {damage}, ASPD: {attackSpeed}, MOVE: {moveSpeed}");
+        
     }
     public override void TakeDamage(float amount)
     {
@@ -77,13 +81,13 @@ public class EnemyStats : BaseStats
         healthBar.DOKill();
         text_CurrentHealth.DOKill();
 
-        healthBar.DOFillAmount(targetFill, ConstsAndEnums.HEALTH_BAR_TWEEN_DURATION)
+        healthBar.DOFillAmount(targetFill, Utility.HEALTH_BAR_TWEEN_DURATION)
                  .From(currentFill)
                  .SetEase(Ease.OutQuad);
 
         // 텍스트 변경
         float currentValue = float.Parse(text_CurrentHealth.text);
-        DOTween.To(() => currentValue, x => text_CurrentHealth.text = Mathf.RoundToInt(x).ToString(), CurrentHealth, ConstsAndEnums.HEALTH_BAR_TWEEN_DURATION)
+        DOTween.To(() => currentValue, x => text_CurrentHealth.text = Mathf.RoundToInt(x).ToString(), CurrentHealth, Utility.HEALTH_BAR_TWEEN_DURATION)
                .SetEase(Ease.OutQuad);
     }
 }
