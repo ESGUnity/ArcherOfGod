@@ -60,11 +60,13 @@ public class PlayerController : MonoBehaviour
 #endif
         HandleMovementAnimation();
 
-        // 이동하지 않고, 플레이 중이며 스킬 사용 중이 아니면 공격 루프 시작
+        // 이동하지 않고, 웨이브 진행 중이며, 스킬 사용 중이 아니면 공격 루프 시작
         if (Mathf.Abs(moveInput) < 0.01f && GameManager.Instance.CurrentState == GameStateEnum.Playing && !skills.IsUsingSkill)
         {
             if (attackRoutine == null)
+            {
                 attackRoutine = StartCoroutine(AttackLoop());
+            }
         }
         else
         {
@@ -110,8 +112,8 @@ public class PlayerController : MonoBehaviour
             // 공격 시작
             isAttacking = true;
             animator.SetTrigger("BasicAttack");
+
             transform.eulerAngles = new Vector3(0, forwardY, 0);
-            yield return null; // 한 프레임 대기하여 애니메이터 상태 반영
 
             // 현재 BasicAttack 클립 길이 가져오기
             AnimatorClipInfo[] clipInfos = animator.GetCurrentAnimatorClipInfo(0);

@@ -17,78 +17,107 @@ public class EnemyAI : MonoBehaviour
     private Rigidbody2D rb;
     private Animator animator;
 
-    // 필드
+    // 상태 변수
     private Coroutine attackRoutine;
-    private float moveDirection = 1f;
+    private float moveInput = 0f;
+    private bool isAttacking = false;
 
     // 상수
-    private const float forwardY = 180f; // 공격 시 바라볼 방향
+    private const float forwardY = 180f; // 공격 시 고정 회전값
 
+    // 유니티 콜백
     private void Awake()
     {
         TryGetComponent(out stats);
         TryGetComponent(out rb);
-        animator = GetComponentInChildren<Animator>(); // 자식 오브젝트에서 Animator 가져오기
+        animator = GetComponentInChildren<Animator>();
     }
-
     private void Start()
     {
         StartCoroutine(MoveAndAttackRoutine());
     }
     private void Update()
     {
-        healthUICanvas.eulerAngles = transform.eulerAngles + new Vector3(0, 180, 0); // 급하게 체력 UI 수정
+        healthUICanvas.localRotation = transform.rotation;
+    }
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector2(moveInput * stats.MoveSpeed, rb.linearVelocityY);
     }
 
-    // 이동 및 공격
+    // 메인
     private IEnumerator MoveAndAttackRoutine()
     {
         while (true)
         {
-            // Playing 상태가 될 때까지 대기
+            // 게임이 진행 중일 때만 동작
             while (GameManager.Instance.CurrentState != GameStateEnum.Playing)
             {
                 yield return null;
             }
 
-            // ===== 이동 =====
+            // 이동
             float moveTime = 0f;
             float moveDuration = Random.Range(Utility.ENEMY_MIN_MOVE_DURATION, Utility.ENEMY_MAX_MOVE_DURATION);
-
-            animator.SetTrigger("Run");
+            moveInput = Random.Range(0f, 1f) > 0.5 ? 1f : -1f;
 
             while (moveTime < moveDuration)
             {
-                rb.linearVelocity = new Vector2(moveDirection * stats.MoveSpeed, rb.linearVelocity.y);
+                HandleMovementAnimation();
+
                 moveTime += Time.deltaTime;
                 yield return null;
             }
 
-            // 정지
-            rb.linearVelocity = Vector2.zero;
-            animator.SetTrigger("Idle");
-
-            // ===== 공격 =====
+            // 공격
+            moveInput = 0;
+            isAttacking = true;
             int shots = Random.Range(Utility.ENEMY_MIN_ARROWS_PER_STOP, Utility.ENEMY_MAX_ARROWS_PER_STOP);
+            float attackDuration = Mathf.Max(0.1f, stats.AttackSpeed);
+
             for (int i = 0; i < shots; i++)
             {
-                yield return new WaitForSeconds(stats.AttackSpeed);
-
-                // 공격 시작 애니메이션
+                // 공격 시작
+                animator.SetTrigger("BasicAttack");
                 animator.SetTrigger("BasicAttack");
 
-                // **공격할 때만** Y회전을 forwardY로 고정
+                // 공격 시 회전 고정
                 transform.eulerAngles = new Vector3(0, forwardY, 0);
+
+                // 현재 BasicAttack 클립 길이 가져오기
+                AnimatorClipInfo[] clipInfos = animator.GetCurrentAnimatorClipInfo(0);
+                AnimatorClipInfo attackClipInfo = System.Array.Find(clipInfos, c => c.clip.name == "BasicAttack");
+
+                if (attackClipInfo.clip != null)
+                {
+                    float clipLength = attackClipInfo.clip.length;
+                    float multiplier = clipLength / attackDuration;
+
+                    animator.SetFloat("BasicAttackSpeed", multiplier);
+                }
+
+                yield return new WaitForSeconds(stats.AttackSpeed);
 
                 ShootArrow();
             }
 
-            // 방향 전환 (이동 방향만 변경)
-            float randomDir = Random.Range(0f, 1f);
-            moveDirection = randomDir > 0.5f ? -1 : 1;
+            isAttacking = false;
         }
     }
+    private void HandleMovementAnimation()
+    {
+        if (isAttacking) return; // 공격 중에는 Idle/Run 덮어쓰기 방지
 
+        if (Mathf.Abs(moveInput) > 0.01f)
+        {
+            transform.rotation = Quaternion.Euler(0f, moveInput > 0 ? 0f : 180f, 0f);
+            animator.SetTrigger("Run");
+        }
+        else
+        {
+            animator.SetTrigger("Idle");
+        }
+    }
     private void ShootArrow()
     {
         PlayerController target = PlayerController.Instance;

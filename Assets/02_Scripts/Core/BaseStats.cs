@@ -73,4 +73,26 @@ public class BaseStats : MonoBehaviour
     {
         Destroy(gameObject);
     }
+
+    // Ω∫≈» ¿Áº≥¡§
+    public void ModifyAttackSpeed(float speed)
+    {
+        attackSpeed += speed;
+    }
+    public void ModifyDamage(float damage)
+    {
+        this.damage += damage;
+    }
+    public void ModifyMoveSpeed(float speed)
+    {
+        moveSpeed += speed;
+    }
+    public void ModifyJumpShotArrowCount(int count)
+    {
+        jumpShotArrowCount += count;
+    }
+    public void ModifyMultiShotArrowCount(int count)
+    {
+        multiShotArrowCount += count;
+    }
 }

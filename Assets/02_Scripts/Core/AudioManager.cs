@@ -18,10 +18,10 @@ public class AudioManager : MonoBehaviour
     // private 필드
     private float masterVolume = 1f;
 
-    private float bGMVolume = 0.2f;
+    private float bGMVolume = 0.1f;
     private AudioSource bGMPlayer;
     
-    private float sFXVolume = 0.2f;
+    private float sFXVolume = 0.3f;
     private AudioSource[] sFXPlayers;
     private int sFXChannels = 30;
     private int sFXchannelIndex;
@@ -41,6 +41,7 @@ public class AudioManager : MonoBehaviour
     private static AudioManager instance;
     public static AudioManager Instance => instance;
 
+    // 유니티 콜백
     private void Awake()
     {
         if (instance == null)
@@ -54,7 +55,10 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    private void Start()
+    {
+        PlayBGM(BGMEnum.Single);
+    }
     // 메인
     private void Init()
     {

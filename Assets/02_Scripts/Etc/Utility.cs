@@ -34,8 +34,8 @@ public static class Utility
     public const float MULTI_SHOT_ATTACK_SPEED = 1.1f;
 
     // 적 AI 관련
-    public const float ENEMY_MIN_MOVE_DURATION = 1.5f; // 한 방향으로 움직이는 시간
-    public const float ENEMY_MAX_MOVE_DURATION = 2.5f; // 한 방향으로 움직이는 시간
+    public const float ENEMY_MIN_MOVE_DURATION = 1f; // 한 방향으로 움직이는 시간
+    public const float ENEMY_MAX_MOVE_DURATION = 2f; // 한 방향으로 움직이는 시간
     public const int ENEMY_MIN_ARROWS_PER_STOP = 1;
     public const int ENEMY_MAX_ARROWS_PER_STOP = 3;
 
@@ -65,4 +65,12 @@ public enum SkillBtnEnum
     SecondSkill,
     ThirdSkill,
     FourthSkill,
+}
+public enum PlayerBuffEnum
+{
+    AttackSpeedUp,
+    DamageUp,
+    MoveSpeedUp,
+    JumpShotArrowCountUp,
+    MultiShotArrowCountUp
 }

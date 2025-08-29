@@ -17,11 +17,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform playerSpawnPoint;
     [SerializeField] private List<Transform> enemySpawnPoints;
     [SerializeField] private GameObject text_WaveAlarm;
+    [SerializeField] private GameObject text_RewardAlarm;
 
     // private 필드
     private GameStateEnum currentState; // 현재 게임 상태
     private int currentWave = 0; // 현재 웨이브 단계
     private Vector3 waveTextOriginPos = new Vector3(0, 100, 0);
+    private string rewardAlarmText;
+    private Vector3 rewardTextOriginPos = new Vector3(0, -50, 0);
 
     // public Getter
     public GameStateEnum CurrentState => currentState;
@@ -54,38 +57,32 @@ public class GameManager : MonoBehaviour
     // 메인
     private IEnumerator GameFlowRoutine() // 게임의 전체 흐름 코루틴
     {
-        // 스킬 선택 루틴 (임시)
-        // TODO : 나중에는 선택 확인이 올 때까지 대기하는 루틴으로 변경
-        ChangeState(GameStateEnum.SetSkill);
-        Debug.Log("스킬 선택 : 5개를 고르세요...");
-        yield return new WaitForSeconds(2f); // 선택 대기 시뮬레이션
+        yield return new WaitForSeconds(1f); // 1초 대기
 
         // 웨이브 루프 시작
         while (true)
         {
             currentWave++; // 웨이브 증가
-            Debug.Log($"Wave {currentWave} 시작!");
             ChangeState(GameStateEnum.WaitWave);
 
             // 적 스폰
             SpawnEnemies();
+            // 플레이어 버프
+            BuffPlayer();
             // Wave 텍스트 띄우기
-            yield return StartCoroutine(ShowWaveText(currentWave));
+            yield return StartCoroutine(ShowWaveText(currentWave)); // 대기
 
             // 전투 시작
             ChangeState(GameStateEnum.Playing);
-            Debug.Log("전투 시작!");
 
             // 적 전멸 대기
             while (EnemyManager.Instance.HasEnemies())
             {
-                yield return null; // 한 프레임 대기
+                yield return null;
             }
-            Debug.Log("적 전멸!");
 
             // 다음 웨이브 준비 대기
             ChangeState(GameStateEnum.WaitWave);
-            Debug.Log("다음 웨이브 준비 (2초 대기)");
             yield return new WaitForSeconds(2f);
         }
     }
@@ -107,34 +104,98 @@ public class GameManager : MonoBehaviour
         {
             int randomIndex = Random.Range(0, tempPos.Count);
 
-            Instantiate(prefab_Enemy, tempPos[randomIndex].position, Quaternion.identity);
+            GameObject go = Instantiate(prefab_Enemy);
+            go.transform.position = tempPos[randomIndex].position;
             tempPos.RemoveAt(randomIndex);
         }
     }
     private IEnumerator ShowWaveText(int wave)
     {
+        // Wave 텍스트
         text_WaveAlarm.gameObject.SetActive(true);
-        var tmp = text_WaveAlarm.GetComponent<TMP_Text>();
-        tmp.text = $"Wave {wave}";
+        var tmpWave = text_WaveAlarm.GetComponent<TMP_Text>();
+        tmpWave.text = $"Wave {wave}";
 
-        // RectTransform 가져오기
-        RectTransform rect = text_WaveAlarm.GetComponent<RectTransform>();
+        RectTransform rectWave = text_WaveAlarm.GetComponent<RectTransform>();
+        rectWave.anchoredPosition = waveTextOriginPos;
+        tmpWave.alpha = 0f;
 
-        // 초기 세팅
-        rect.anchoredPosition = waveTextOriginPos; // RectTransform 기준
-        tmp.alpha = 0f;
+        // Reward 텍스트
+        text_RewardAlarm.gameObject.SetActive(true);
+        var tmpReward = text_RewardAlarm.GetComponent<TMP_Text>();
+        tmpReward.text = rewardAlarmText; // 필드에 미리 할당된 문자열 사용
 
-        // DOTween Sequence 생성
+        RectTransform rectReward = text_RewardAlarm.GetComponent<RectTransform>();
+        rectReward.anchoredPosition = waveTextOriginPos + new Vector3(0, -150f, 0); // Wave 텍스트 아래쪽
+        tmpReward.alpha = 0f;
+
+        // DOTween Sequence
         Sequence seq = DOTween.Sequence();
-        seq.Append(tmp.DOFade(1f, 0.5f));
-        seq.Join(rect.DOAnchorPosY(waveTextOriginPos.y + 50f, 0.5f)); // 2f 대신 100f 정도로 UI 단위
-        seq.AppendInterval(2f); // 2초 대기
-        seq.Append(tmp.DOFade(0f, 0.5f));
-        seq.Join(rect.DOAnchorPosY(waveTextOriginPos.y, 0.5f));
-        seq.OnComplete(() => text_WaveAlarm.SetActive(false));
+
+        // Wave 텍스트 애니메이션
+        seq.Append(tmpWave.DOFade(1f, 0.5f));
+        seq.Join(rectWave.DOAnchorPosY(waveTextOriginPos.y + 50f, 0.5f));
+
+        // Reward 텍스트 애니메이션
+        seq.Join(tmpReward.DOFade(1f, 0.5f));
+        seq.Join(rectReward.DOAnchorPosY(rectReward.anchoredPosition.y + 50f, 0.5f));
+
+        seq.AppendInterval(2f); // 대기
+
+        // Fade out
+        seq.Append(tmpWave.DOFade(0f, 0.5f));
+        seq.Join(rectWave.DOAnchorPosY(waveTextOriginPos.y, 0.5f));
+        seq.Join(tmpReward.DOFade(0f, 0.5f));
+        seq.Join(rectReward.DOAnchorPosY(rectReward.anchoredPosition.y - 50f, 0.5f));
+
+        seq.OnComplete(() =>
+        {
+            text_WaveAlarm.SetActive(false);
+            text_RewardAlarm.SetActive(false);
+        });
 
         yield return seq.WaitForCompletion();
     }
+    private void BuffPlayer()
+    {
+        // enum에서 무작위 하나 선택
+        PlayerBuffEnum randomBuff = (PlayerBuffEnum)Random.Range(0, System.Enum.GetValues(typeof(PlayerBuffEnum)).Length);
+
+        switch (randomBuff)
+        {
+            case PlayerBuffEnum.AttackSpeedUp:
+                PlayerController.Instance.GetComponent<PlayerStats>().ModifyAttackSpeed(-0.1f);
+                rewardAlarmText = "AttackSpeedUp!";
+                break;
+
+            case PlayerBuffEnum.DamageUp:
+                PlayerController.Instance.GetComponent<PlayerStats>().ModifyDamage(5);
+                rewardAlarmText = "DamageUp!";
+                break;
+
+            case PlayerBuffEnum.MoveSpeedUp:
+                PlayerController.Instance.GetComponent<PlayerStats>().ModifyMoveSpeed(0.2f); 
+                rewardAlarmText = "MoveSpeedUp!";
+                break;
+
+            case PlayerBuffEnum.JumpShotArrowCountUp:
+                PlayerController.Instance.GetComponent<PlayerStats>().ModifyJumpShotArrowCount(1);
+                rewardAlarmText = "JumpShotArrowCountUp!";
+                break;
+
+            case PlayerBuffEnum.MultiShotArrowCountUp:
+                PlayerController.Instance.GetComponent<PlayerStats>().ModifyMultiShotArrowCount(1);
+                rewardAlarmText = "MultiShotArrowCountUp!";
+                break;
+
+            default:
+                Debug.LogWarning("Unknown buff type!");
+                rewardAlarmText = "Unknown Buff!";
+                break;
+        }
+    }
+
+
 
     // 게임 플로우 제어
     public void PauseGame()
